@@ -51,7 +51,28 @@ Zet `ANTHROPIC_API_KEY` in `backend/.env` (console.anthropic.com → API keys).
 Eerste keer: `./scripts/fetch_piper_voice.sh` in `backend/` om de stem
 (~60MB, git-ignored) te downloaden.
 
-**Volgende: Fase 4** — opslaan & bibliotheek.
+## Status — Fase 4 (bewaren & bibliotheek) ✅
+
+- [x] `PUT /stories/{id}/saved` + hartje op het verhaalscherm (optimistisch).
+- [x] `GET /stories` = de bibliotheek (alleen saved + approved, per user);
+      `GET /stories/{id}` om te heropenen. Autorisatie centraal in
+      `_get_owned_story` — andermans verhaal → 404 (geen bestaans-oracle).
+- [x] Bibliotheekscherm in de app: lijst, emoji per onderwerp, audio-indicator,
+      tik om te heropenen (tekst + audio, geen "opnieuw").
+- [x] **Rate limiting** (`services/rate_limit.py`, via `usage_events`):
+      20 generaties + 40 audio per gebruiker per uur.
+
+### Beveiliging — voor productie nog doen
+
+- `assets/.env` in de app: `DEBUG_LOGGING=false` in release builds.
+- Backend prod: **geen** `ENVIRONMENT`/`DEBUG` env → defaults zijn al veilig
+  (`production`, geen `/docs`, geen SQL-echo). API alleen via HTTPS.
+- `/media/*` audio staat nu achter een onraadbare UUID maar zonder auth —
+  vóór launch achter een auth-check of signed URL zetten. Geen opschoning van
+  oude bestanden/niet-bewaarde verhalen (toevoegen).
+- Security headers (HSTS etc.) via reverse proxy.
+
+**Volgende: Fase 5** — abonnement (RevenueCat) + gratis-laag limiet.
 
 ### Supabase-dashboard (eenmalig instellen)
 

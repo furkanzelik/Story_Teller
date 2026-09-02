@@ -25,6 +25,7 @@ import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -145,24 +146,38 @@ def get_current_user(
 
 
 def _upsert_user(db: Session, claims: TokenClaims) -> User:
+    # Identity is the auth provider's subject id, never the (mutable) email.
     user = db.scalar(select(User).where(User.auth_subject == claims.subject))
-    if user is None:
-        user = User(
-            email=claims.email or f"{claims.subject}@users.noreply.supabase.co",
-            auth_provider="supabase",
-            auth_subject=claims.subject,
+    if user is not None:
+        if claims.email and user.email != claims.email:
+            try:
+                user.email = claims.email
+                db.commit()
+            except IntegrityError:  # another row already has that email
+                db.rollback()
+        return user
+
+    user = User(
+        email=claims.email or f"{claims.subject}@users.noreply.supabase.co",
+        auth_provider="supabase",
+        auth_subject=claims.subject,
+    )
+    db.add(user)
+    db.add(
+        Subscription(
+            user=user, status=SubscriptionStatus.free, provider="revenuecat"
         )
-        db.add(user)
-        db.add(
-            Subscription(
-                user=user,
-                status=SubscriptionStatus.free,
-                provider="revenuecat",
-            )
+    )
+    try:
+        db.commit()
+    except IntegrityError:
+        # Race: a concurrent request created this user (or the email collides).
+        db.rollback()
+        existing = db.scalar(
+            select(User).where(User.auth_subject == claims.subject)
         )
-        db.commit()
-        db.refresh(user)
-    elif claims.email and user.email != claims.email:
-        user.email = claims.email
-        db.commit()
+        if existing is None:
+            raise
+        return existing
+    db.refresh(user)
     return user

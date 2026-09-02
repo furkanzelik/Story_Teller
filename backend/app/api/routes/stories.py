@@ -7,11 +7,13 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_media_storage, get_story_pipeline, get_tts_provider
+from app.core.config import get_settings
 from app.core.security import get_current_user
 from app.db.session import get_db
 from app.models import ModerationStatus, Story, Topic, UsageEvent, User
 from app.schemas import AudioOut, GenerateStoryIn, SetSavedIn, StoryOut
 from app.services.prompts import AGE_BANDS
+from app.services.rate_limit import enforce_rate_limit
 from app.services.storage import MediaStorage
 from app.services.story_pipeline import (
     StoryModerationFailed,
@@ -65,6 +67,18 @@ def generate_story(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Ongeldige leeftijdsgroep.",
         )
+
+    settings = get_settings()
+    # Abuse limit: count attempts (not just successes) so a loop of failures
+    # can't burn the paid LLM either.
+    enforce_rate_limit(
+        db,
+        user.id,
+        kind="generation_attempt",
+        limit=settings.generation_rate_limit_per_hour,
+    )
+    db.add(UsageEvent(user_id=user.id, kind="generation_attempt"))
+    db.commit()
 
     try:
         result = pipeline.run(topic_label, payload.age_group)
@@ -152,8 +166,16 @@ def story_audio(
     """
     story = _get_owned_story(db, story_id, user, require_approved=True)
 
+    # Cached replays are free — no limit check.
     if story.audio_url and storage.exists(Path(story.audio_url).name):
         return AudioOut(audio_url=story.audio_url)
+
+    enforce_rate_limit(
+        db,
+        user.id,
+        kind="audio_generated",
+        limit=get_settings().audio_rate_limit_per_hour,
+    )
 
     try:
         result = tts.synthesize(story.body)
@@ -168,6 +190,7 @@ def story_audio(
     storage.save(name, result.audio)
     story.audio_url = storage.url_path(name)
     story.audio_voice = result.voice
+    db.add(UsageEvent(user_id=user.id, kind="audio_generated"))
     db.commit()
     return AudioOut(audio_url=story.audio_url)
 

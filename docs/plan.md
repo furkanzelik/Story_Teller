@@ -26,9 +26,13 @@ Provider-onafhankelijk (`services/tts.py`): `TTS_PROVIDER=elevenlabs` + key omze
 en de rest verandert niet. Piper-synth ~30-40s voor een heel verhaal (draait
 ná de tekst, wordt gecacht); ElevenLabs/Google zou ~3-5s zijn.
 
-## Fase 4 — Bewaren & gebruikers
-12. "Opslaan": verhaal + audio aan account koppelen
-13. Bibliotheekscherm: opgeslagen verhalen terugvinden en herbeluisteren
+## Fase 4 — Bewaren & gebruikers ✅
+12. "Opslaan": `PUT /stories/{id}/saved`, hartje op verhaalscherm (optimistisch)  ✅
+13. Bibliotheekscherm: `GET /stories` (alleen saved+approved, per user), tik → heropenen  ✅
+
+Autorisatie centraal in `_get_owned_story` (IDOR → 404). `GET /stories/{id}` voor
+heropenen. Rate limiting toegevoegd (`services/rate_limit.py`, via `usage_events`):
+20 generaties + 40 audio per user per uur.
 
 ## Fase 5 — Monetization & compliance
 14. Ouder-gate vóór instellingen en betaalscherm  (client-deel staat al)

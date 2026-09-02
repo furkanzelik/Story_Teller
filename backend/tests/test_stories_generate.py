@@ -63,10 +63,13 @@ def test_generate_happy_path_persists_story_and_usage(client, db_session, test_u
     story = db_session.scalar(select(Story).where(Story.user_id == test_user.id))
     assert story.moderation_status == ModerationStatus.approved
     assert story.llm_model == "claude-haiku-4-5"
-    events = db_session.scalars(
-        select(UsageEvent).where(UsageEvent.user_id == test_user.id)
-    ).all()
-    assert [e.kind for e in events] == ["story_generated"]
+    kinds = sorted(
+        e.kind
+        for e in db_session.scalars(
+            select(UsageEvent).where(UsageEvent.user_id == test_user.id)
+        )
+    )
+    assert kinds == ["generation_attempt", "story_generated"]
 
 
 def test_generate_moderation_failure_returns_422_and_audit_row(
@@ -79,9 +82,14 @@ def test_generate_moderation_failure_returns_422_and_audit_row(
     story = db_session.scalar(select(Story).where(Story.user_id == test_user.id))
     assert story.moderation_status == ModerationStatus.rejected
     assert "violence" in story.moderation_notes
-    assert db_session.scalars(
-        select(UsageEvent).where(UsageEvent.user_id == test_user.id)
-    ).all() == []
+    # The attempt is metered; no successful-generation event.
+    kinds = [
+        e.kind
+        for e in db_session.scalars(
+            select(UsageEvent).where(UsageEvent.user_id == test_user.id)
+        )
+    ]
+    assert kinds == ["generation_attempt"]
 
 
 def test_generate_service_error_returns_502(client, topic):

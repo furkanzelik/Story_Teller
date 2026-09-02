@@ -18,8 +18,15 @@ class Settings(BaseSettings):
     )
 
     app_name: str = "Verhaaltjesmaker API"
-    environment: str = "development"
-    debug: bool = True
+    # Production-safe defaults: local dev flips these on via backend/.env.
+    environment: str = "production"
+    debug: bool = False
+    # Expose /docs, /redoc, /openapi.json (auto-on in non-production).
+    enable_docs: bool = False
+
+    # Abuse limits per user per hour (independent of the Fase 5 free-tier quota).
+    generation_rate_limit_per_hour: int = 20
+    audio_rate_limit_per_hour: int = 40
 
     # postgresql+psycopg://user:pass@host:5432/dbname
     database_url: str = (
@@ -57,14 +64,20 @@ class Settings(BaseSettings):
     elevenlabs_api_key: str | None = None
     elevenlabs_voice_id: str | None = None
     elevenlabs_model: str = "eleven_multilingual_v2"
-    # Where generated audio is cached + how the app reaches it.
+    # Where generated audio is cached.
     media_dir: str = "media"
-    # Public base URL for media; when None it's built from the request host.
-    media_base_url: str | None = None
 
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
+    @property
+    def is_dev(self) -> bool:
+        return self.environment != "production"
+
+    @property
+    def docs_enabled(self) -> bool:
+        return self.enable_docs or self.is_dev
 
 
 @lru_cache
