@@ -1,0 +1,27 @@
+# ---- Flutter / Dart ----
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/build/
+app/.idea/
+app/*.iml
+app/ios/Pods/
+app/ios/.symlinks/
+app/android/.gradle/
+app/android/local.properties
+app/assets/.env
+
+# ---- Python / backend ----
+backend/.venv/
+backend/__pycache__/
+**/__pycache__/
+*.py[cod]
+backend/.env
+backend/.pytest_cache/
+backend/media/
+backend/voices/*.onnx
+backend/voices/*.onnx.json
+
+# ---- misc ----
+.DS_Store
+*.log
