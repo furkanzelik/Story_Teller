@@ -116,6 +116,11 @@ class ApiClient {
     final res = await _dio.get<Map<String, dynamic>>('/me/subscription');
     return Subscription.fromJson(res.data!);
   }
+
+  /// DELETE /me — permanently delete the account and all its data.
+  Future<void> deleteAccount() async {
+    await _dio.delete<void>('/me');
+  }
 }
 
 class StoryAudioException implements Exception {

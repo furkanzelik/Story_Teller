@@ -42,6 +42,13 @@ class Env {
   static bool get hasSupabaseConfig =>
       supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
 
+  /// Public URL of the published privacy policy (empty until it's online).
+  static String get privacyPolicyUrl {
+    const fromDefine = String.fromEnvironment('PRIVACY_POLICY_URL');
+    if (fromDefine.isNotEmpty) return fromDefine;
+    return _env('PRIVACY_POLICY_URL') ?? '';
+  }
+
   /// Toggles verbose network / provider logging.
   static bool get debugLogging {
     const fromDefine =

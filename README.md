@@ -85,7 +85,26 @@ Eerste keer: `./scripts/fetch_piper_voice.sh` in `backend/` om de stem
       app (init met `appUserID = users.id`), App Store/Play producten,
       `REVENUECAT_WEBHOOK_AUTH`. Koop-knop toont nu "Binnenkort beschikbaar".
 
-**Volgende: Fase 6** — polish & store-ready (privacybeleid, kids-categorie eisen).
+## Status — Fase 6 (polish & store-ready) ◑
+
+- [x] **UI-polish**: fonts gebundeld (Baloo2/Nunito in `assets/google_fonts/`,
+      geen netwerk meer nodig), `DreamyLoader` (ademende maan + fonkelende
+      sterren) i.p.v. spinner, haptische feedback, dark mode gecheckt.
+- [x] **Branding**: app-icoon + native splash (`tool/make_icon.py` →
+      `flutter_launcher_icons` / `flutter_native_splash`), display-naam
+      "Verhaaltjesmaker" in Info.plist + AndroidManifest.
+- [x] **Account verwijderen** in de app (Instellingen, achter de ouder-gate) →
+      `DELETE /me` (cascade + audio-bestanden; ook Supabase-authgebruiker als
+      `SUPABASE_SERVICE_KEY` is gezet).
+- [x] **Compliance-docs**: `docs/privacy-policy.md`, `docs/store-compliance.md`,
+      `docs/store-submission.md`.
+- [x] **Adversariële tests**: `backend/tests/test_adversarial.py`.
+- [ ] Handmatig: privacybeleid publiceren + `PRIVACY_POLICY_URL` invullen,
+      store-screenshots, age-rating/Data-safety, productie-backend deployen,
+      `flutter build ipa` / `appbundle` (Apple/Google accounts).
+
+**MVP-functionaliteit is compleet (Fase 1–5).** Fase 6 rest = handmatige
+store-stappen — zie `docs/store-submission.md`.
 
 ### Supabase-dashboard (eenmalig instellen)
 

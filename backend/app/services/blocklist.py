@@ -14,7 +14,8 @@ import re
 _BLOCKED_TERMS: tuple[str, ...] = (
     # violence / weapons
     "pistool", "geweer", "mes steken", "neersteken", "wapen", "kogel",
-    "bom", "explosie", "bloed", "vermoord", "moord", "doodschieten",
+    "explosie", "bloed", "vermoord", "vermoorden", "vermoordde", "moord",
+    "doodschieten", "doodmaken", "doden",
     "gun", "knife", "kill", "blood", "weapon",
     # death / grief
     "begrafenis", "overleden", "gestorven", "dood ging", "doodgaan",

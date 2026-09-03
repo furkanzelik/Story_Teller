@@ -46,6 +46,9 @@ class _LibRepo implements StoryRepository {
           resetsAt: DateTime(2026, 1, 5),
         ),
       );
+
+  @override
+  Future<void> deleteAccount() async {}
 }
 
 class _StubAudio extends AudioController {

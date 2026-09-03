@@ -50,6 +50,10 @@ class Settings(BaseSettings):
     # unverified tokens.
     supabase_jwt_secret: str | None = None
     supabase_jwt_audience: str = "authenticated"
+    # Secret API key (sb_secret_… / legacy service_role). Only used to also
+    # delete the Supabase auth user on account deletion; local data is wiped
+    # regardless. Keep this out of the app and out of git.
+    supabase_service_key: str | None = None
 
     # --- story generation + moderation (Fase 2) ---
     # console.anthropic.com -> API keys. When unset, /stories/generate

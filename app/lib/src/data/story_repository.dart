@@ -19,6 +19,8 @@ abstract class StoryRepository {
   Future<Story> setStorySaved(String storyId, {required bool saved});
 
   Future<Subscription> fetchSubscription();
+
+  Future<void> deleteAccount();
 }
 
 class ApiStoryRepository implements StoryRepository {
@@ -46,6 +48,9 @@ class ApiStoryRepository implements StoryRepository {
 
   @override
   Future<Subscription> fetchSubscription() => _api.fetchSubscription();
+
+  @override
+  Future<void> deleteAccount() => _api.deleteAccount();
 }
 
 final storyRepositoryProvider = Provider<StoryRepository>(

@@ -32,6 +32,9 @@ class FakeStorage:
     def save(self, name: str, data: bytes) -> None:
         self.files[name] = data
 
+    def delete(self, name: str) -> None:
+        self.files.pop(name, None)
+
     def url_path(self, name: str) -> str:
         return f"/media/{name}"
 

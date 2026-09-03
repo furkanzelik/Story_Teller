@@ -65,7 +65,7 @@ def generate_story(
 
     if payload.age_group not in AGE_BANDS:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Ongeldige leeftijdsgroep.",
         )
 
@@ -102,7 +102,7 @@ def generate_story(
         db.commit()
         logger.info("generation rejected for user %s: %s", user.id, exc.note)
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="We konden geen passend verhaaltje maken. Kies een ander onderwerp.",
         ) from exc
     except StoryServiceError as exc:
@@ -234,6 +234,6 @@ def _resolve_topic(db: Session, payload: GenerateStoryIn) -> tuple[str | None, s
             detail="Eigen onderwerpen kunnen nog niet.",
         )
     raise HTTPException(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         detail="Kies een onderwerp.",
     )

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -62,7 +63,10 @@ class TopicSelectionScreen extends ConsumerWidget {
                     _TopicTile(
                       topic: topic,
                       selected: selection.topic?.id == topic.id,
-                      onTap: () => controller.chooseTopic(topic),
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        controller.chooseTopic(topic);
+                      },
                     ),
                 ],
               ),
@@ -98,6 +102,7 @@ class TopicSelectionScreen extends ConsumerWidget {
               child: FilledButton.icon(
                 onPressed: selection.isComplete
                     ? () {
+                        HapticFeedback.mediumImpact();
                         ref.read(storyRequestProvider.notifier).state =
                             const GenerateStoryRequest();
                         context.push(Routes.story);

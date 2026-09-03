@@ -45,11 +45,18 @@ heropenen. Rate limiting toegevoegd (`services/rate_limit.py`, via `usage_events
 Nog te doen bij store-setup: `purchases_flutter` (RevenueCat SDK) in de app,
 `REVENUECAT_WEBHOOK_AUTH` in `.env`, App Store / Play Console producten.
 
-## Fase 6 — Polish & store-ready
-17. Kindvriendelijke UI-polish
-18. Privacybeleid + kids-categorie eisen Apple/Google
-19. Testen met echte topics/edge cases
-20. Store-submissie
+## Fase 6 — Polish & store-ready ◑
+17. UI-polish: gebundelde fonts (geen netwerk), `DreamyLoader` (maan+sterren
+    i.p.v. spinner), haptics, dark mode gecheckt, app-icoon + splash,
+    display-naam "Verhaaltjesmaker".                                          ✅
+18. Compliance: `docs/privacy-policy.md`, `docs/store-compliance.md`;
+    in-app "Account verwijderen" (`DELETE /me`, cascade + media-cleanup).     ✅ (docs af te maken)
+19. Edge-case tests: `backend/tests/test_adversarial.py`.                     ✅
+20. `docs/store-submission.md` — checklist (accounts, assets, builds, deploy). ✅ (uitvoeren)
+
+Handmatig nog: privacybeleid publiceren + URL invullen, screenshots,
+age-rating/Data-safety formulieren, productie-backend deployen, `flutter build
+ipa/appbundle` met Apple/Google accounts.
 
 ## Harde eisen (niet onderhandelbaar)
 1. Moderatie-check op elke verhaaltekst vóór teruggeven.

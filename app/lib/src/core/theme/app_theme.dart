@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 /// App-wide theme.
 ///
@@ -7,9 +6,15 @@ import 'package:google_fonts/google_fonts.dart';
 ///  - warm, low-contrast night palette (nothing harsh before sleep)
 ///  - large tap targets (min 56dp) and generous spacing
 ///  - rounded, friendly shapes
-///  - a rounded, highly legible typeface (Baloo 2 / Nunito)
+///  - a rounded, highly legible typeface (Baloo 2 for headings, Nunito for body)
+///
+/// Fonts are bundled (`assets/google_fonts/`), so the app never waits on the
+/// network for text rendering.
 class AppTheme {
   const AppTheme._();
+
+  static const _heading = 'Baloo2';
+  static const _body = 'Nunito';
 
   // Core palette — deep indigo "night sky" with warm accents.
   static const Color _seed = Color(0xFF5B4B8A);
@@ -28,25 +33,27 @@ class AppTheme {
       tertiary: _accentGold,
     );
 
-    final baseText = brightness == Brightness.dark
-        ? Typography.material2021().white
-        : Typography.material2021().black;
-
-    return ThemeData(
+    final base = ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
+      brightness: brightness,
       scaffoldBackgroundColor: scheme.surface,
-      textTheme: GoogleFonts.baloo2TextTheme(baseText).copyWith(
-        bodyLarge: GoogleFonts.nunito(
-          textStyle: baseText.bodyLarge,
+      fontFamily: _heading,
+    );
+
+    return base.copyWith(
+      textTheme: base.textTheme.copyWith(
+        bodyLarge: base.textTheme.bodyLarge?.copyWith(
+          fontFamily: _body,
           fontSize: 18,
           height: 1.5,
         ),
-        bodyMedium: GoogleFonts.nunito(
-          textStyle: baseText.bodyMedium,
+        bodyMedium: base.textTheme.bodyMedium?.copyWith(
+          fontFamily: _body,
           fontSize: 16,
           height: 1.5,
         ),
+        bodySmall: base.textTheme.bodySmall?.copyWith(fontFamily: _body),
       ),
       appBarTheme: AppBarTheme(
         centerTitle: true,
@@ -57,7 +64,11 @@ class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size.fromHeight(60),
-          textStyle: GoogleFonts.baloo2(fontSize: 20, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(
+            fontFamily: _heading,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),

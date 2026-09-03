@@ -46,6 +46,9 @@ class _FakeRepo implements StoryRepository {
 
   @override
   Future<Subscription> fetchSubscription() async => freeSubscription();
+
+  @override
+  Future<void> deleteAccount() async {}
 }
 
 Subscription freeSubscription({int used = 0}) => Subscription(

@@ -13,6 +13,7 @@ from typing import Protocol
 class MediaStorage(Protocol):
     def exists(self, name: str) -> bool: ...
     def save(self, name: str, data: bytes) -> None: ...
+    def delete(self, name: str) -> None: ...
     def url_path(self, name: str) -> str: ...
 
 
@@ -31,6 +32,9 @@ class LocalMediaStorage:
 
     def save(self, name: str, data: bytes) -> None:
         self._path(name).write_bytes(data)
+
+    def delete(self, name: str) -> None:
+        self._path(name).unlink(missing_ok=True)
 
     def url_path(self, name: str) -> str:
         return f"/media/{Path(name).name}"

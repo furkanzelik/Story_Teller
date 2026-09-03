@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/widgets/dreamy_loader.dart';
 import '../../data/api/api_client.dart';
 import '../../data/models/story.dart';
 import '../topic_selection/topic_selection_screen.dart';
@@ -75,27 +76,9 @@ class _Loading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.auto_stories_rounded,
-              size: 72, color: theme.colorScheme.primary),
-          const SizedBox(height: 24),
-          const SizedBox(
-            width: 32,
-            height: 32,
-            child: CircularProgressIndicator(strokeWidth: 3),
-          ),
-          const SizedBox(height: 24),
-          Text('De verhaaltjesmaker denkt na…',
-              style: theme.textTheme.titleMedium),
-          const SizedBox(height: 4),
-          Text('Dit duurt heel even.',
-              style: theme.textTheme.bodyMedium),
-        ],
-      ),
+    return const DreamyLoader(
+      message: 'De verhaaltjesmaker denkt na…',
+      hint: 'Dit duurt heel even.',
     );
   }
 }
