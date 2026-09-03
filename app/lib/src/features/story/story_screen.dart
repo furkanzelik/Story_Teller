@@ -164,6 +164,7 @@ class _Error extends StatelessWidget {
         ? (error as StoryGenerationException).message
         : 'Er ging iets mis. Probeer het opnieuw.';
     final isModeration = failure == StoryGenerationFailure.moderation;
+    final isLimit = failure == StoryGenerationFailure.limitReached;
 
     return Column(
       children: [
@@ -175,9 +176,13 @@ class _Error extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    isModeration
-                        ? Icons.shield_outlined
-                        : Icons.cloud_off_rounded,
+                    switch (failure) {
+                      StoryGenerationFailure.moderation =>
+                        Icons.shield_outlined,
+                      StoryGenerationFailure.limitReached =>
+                        Icons.workspace_premium_outlined,
+                      _ => Icons.cloud_off_rounded,
+                    },
                     size: 64,
                     color: theme.colorScheme.outline,
                   ),
@@ -185,6 +190,12 @@ class _Error extends StatelessWidget {
                   Text(message,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyLarge),
+                  if (isLimit) ...[
+                    const SizedBox(height: 8),
+                    Text('Op maandag krijg je er weer nieuwe.',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium),
+                  ],
                 ],
               ),
             ),
@@ -192,16 +203,30 @@ class _Error extends StatelessWidget {
         ),
         _BottomBar(
           children: [
-            OutlinedButton.icon(
-              onPressed: () => context.go('/topics'),
-              icon: const Icon(Icons.grid_view_rounded),
-              label: const Text('Ander onderwerp'),
-            ),
-            FilledButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh_rounded),
-              label: Text(isModeration ? 'Opnieuw proberen' : 'Nog eens'),
-            ),
+            if (isLimit)
+              OutlinedButton.icon(
+                onPressed: () => context.push('/paywall'),
+                icon: const Icon(Icons.workspace_premium_outlined),
+                label: const Text('Abonnement'),
+              )
+            else
+              OutlinedButton.icon(
+                onPressed: () => context.go('/topics'),
+                icon: const Icon(Icons.grid_view_rounded),
+                label: const Text('Ander onderwerp'),
+              ),
+            if (isLimit)
+              FilledButton.icon(
+                onPressed: () => context.go('/'),
+                icon: const Icon(Icons.home_rounded),
+                label: const Text('Naar start'),
+              )
+            else
+              FilledButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh_rounded),
+                label: Text(isModeration ? 'Opnieuw proberen' : 'Nog eens'),
+              ),
           ],
         ),
       ],

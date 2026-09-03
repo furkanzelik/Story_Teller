@@ -114,3 +114,26 @@ def test_generate_invalid_age_group_422(client, topic):
     _use_pipeline(FakePipeline())
     r = client.post("/stories/generate", json={"topic_id": "space", "age_group": "20-30"})
     assert r.status_code == 422
+
+
+def test_generate_blocked_by_free_quota_returns_402(
+    client, db_session, test_user, topic
+):
+    from datetime import UTC, datetime, timedelta
+
+    from app.models import UsageEvent
+
+    for _ in range(2):  # free_stories_per_week default is 2
+        db_session.add(
+            UsageEvent(
+                user_id=test_user.id,
+                kind="story_generated",
+                created_at=datetime.now(UTC) - timedelta(hours=1),
+            )
+        )
+    db_session.flush()
+    _use_pipeline(FakePipeline())
+
+    r = client.post("/stories/generate", json={"topic_id": "space", "age_group": "4-5"})
+    assert r.status_code == 402
+    assert r.json()["detail"]["reason"] == "free_quota_exhausted"

@@ -7,6 +7,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:story_teller_app/src/app.dart';
 import 'package:story_teller_app/src/data/models/age_group.dart';
 import 'package:story_teller_app/src/data/models/story.dart';
+import 'package:story_teller_app/src/data/models/subscription.dart';
 import 'package:story_teller_app/src/data/story_repository.dart';
 import 'package:story_teller_app/src/features/auth/auth_controller.dart';
 import 'package:story_teller_app/src/features/story/audio_controller.dart';
@@ -33,6 +34,18 @@ class _LibRepo implements StoryRepository {
   @override
   Future<Story> setStorySaved(String storyId, {required bool saved}) async =>
       throw UnimplementedError();
+
+  @override
+  Future<Subscription> fetchSubscription() async => Subscription(
+        status: SubscriptionStatus.free,
+        quota: Quota(
+          unlimited: false,
+          limit: 2,
+          used: 0,
+          remaining: 2,
+          resetsAt: DateTime(2026, 1, 5),
+        ),
+      );
 }
 
 class _StubAudio extends AudioController {

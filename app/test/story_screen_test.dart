@@ -8,6 +8,7 @@ import 'package:story_teller_app/src/app.dart';
 import 'package:story_teller_app/src/data/api/api_client.dart';
 import 'package:story_teller_app/src/data/models/age_group.dart';
 import 'package:story_teller_app/src/data/models/story.dart';
+import 'package:story_teller_app/src/data/models/subscription.dart';
 import 'package:story_teller_app/src/data/models/topic.dart';
 import 'package:story_teller_app/src/data/story_repository.dart';
 import 'package:story_teller_app/src/features/auth/auth_controller.dart';
@@ -42,7 +43,21 @@ class _FakeRepo implements StoryRepository {
   @override
   Future<Story> setStorySaved(String storyId, {required bool saved}) async =>
       (result ?? _story()).copyWith(isSaved: saved);
+
+  @override
+  Future<Subscription> fetchSubscription() async => freeSubscription();
 }
+
+Subscription freeSubscription({int used = 0}) => Subscription(
+      status: SubscriptionStatus.free,
+      quota: Quota(
+        unlimited: false,
+        limit: 2,
+        used: used,
+        remaining: 2 - used,
+        resetsAt: DateTime(2026, 1, 5),
+      ),
+    );
 
 Story _story() => Story(
       id: 'abc',
@@ -113,6 +128,20 @@ void main() {
 
     expect(repo.calls, 2);
     container.dispose();
+  });
+
+  testWidgets('free-quota exhausted shows the paywall CTA', (tester) async {
+    await _pump(
+      tester,
+      _FakeRepo(
+        error:
+            const StoryGenerationException(StoryGenerationFailure.limitReached),
+      ),
+    );
+
+    expect(find.textContaining('gratis verhaaltjes voor deze week'),
+        findsOneWidget);
+    expect(find.widgetWithText(OutlinedButton, 'Abonnement'), findsOneWidget);
   });
 
   testWidgets('heart toggles the saved state', (tester) async {

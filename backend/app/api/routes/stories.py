@@ -13,6 +13,7 @@ from app.db.session import get_db
 from app.models import ModerationStatus, Story, Topic, UsageEvent, User
 from app.schemas import AudioOut, GenerateStoryIn, SetSavedIn, StoryOut
 from app.services.prompts import AGE_BANDS
+from app.services.quota import enforce_free_quota
 from app.services.rate_limit import enforce_rate_limit
 from app.services.storage import MediaStorage
 from app.services.story_pipeline import (
@@ -77,6 +78,9 @@ def generate_story(
         kind="generation_attempt",
         limit=settings.generation_rate_limit_per_hour,
     )
+    # Business limit: free tier gets N successful stories per week (402 -> paywall).
+    enforce_free_quota(db, user, settings)
+
     db.add(UsageEvent(user_id=user.id, kind="generation_attempt"))
     db.commit()
 

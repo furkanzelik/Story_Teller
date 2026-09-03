@@ -72,7 +72,20 @@ Eerste keer: `./scripts/fetch_piper_voice.sh` in `backend/` om de stem
   oude bestanden/niet-bewaarde verhalen (toevoegen).
 - Security headers (HSTS etc.) via reverse proxy.
 
-**Volgende: Fase 5** — abonnement (RevenueCat) + gratis-laag limiet.
+## Status — Fase 5 (monetization) ◑
+
+- [x] **Gratis-laag limiet**: 2 verhalen per kalenderweek (ma 00:00 UTC) voor
+      niet-abonnees. `services/quota.py` telt `story_generated`-events; over de
+      limiet → **402** met `resets_at`. Abonnees (`active`/`in_grace`) onbeperkt.
+- [x] App: paywall-CTA bij 402, "nog N deze week"-hint op home, echt
+      paywall-scherm met live quota-banner (`GET /me/subscription`).
+- [x] `POST /webhooks/revenuecat` — event-mapping + auth-check klaar; activeer
+      met `REVENUECAT_WEBHOOK_AUTH` in `.env`.
+- [ ] **Nog doen bij store-setup**: `purchases_flutter` (RevenueCat SDK) in de
+      app (init met `appUserID = users.id`), App Store/Play producten,
+      `REVENUECAT_WEBHOOK_AUTH`. Koop-knop toont nu "Binnenkort beschikbaar".
+
+**Volgende: Fase 6** — polish & store-ready (privacybeleid, kids-categorie eisen).
 
 ### Supabase-dashboard (eenmalig instellen)
 

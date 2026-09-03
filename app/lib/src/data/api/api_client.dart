@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/config/env.dart';
 import '../models/story.dart';
+import '../models/subscription.dart';
 
 /// Thin wrapper around [Dio] configured for the FastAPI backend.
 ///
@@ -109,6 +110,12 @@ class ApiClient {
     );
     return Story.fromJson(res.data!);
   }
+
+  /// GET /me/subscription — status + this week's free-tier usage.
+  Future<Subscription> fetchSubscription() async {
+    final res = await _dio.get<Map<String, dynamic>>('/me/subscription');
+    return Subscription.fromJson(res.data!);
+  }
 }
 
 class StoryAudioException implements Exception {
@@ -122,7 +129,13 @@ class StoryAudioException implements Exception {
       };
 }
 
-enum StoryGenerationFailure { moderation, unavailable, notSignedIn, unknown }
+enum StoryGenerationFailure {
+  moderation,
+  unavailable,
+  notSignedIn,
+  limitReached,
+  unknown,
+}
 
 class StoryGenerationException implements Exception {
   const StoryGenerationException(this.kind);
@@ -130,6 +143,8 @@ class StoryGenerationException implements Exception {
   final StoryGenerationFailure kind;
 
   factory StoryGenerationException.fromStatus(int? status) => switch (status) {
+        402 =>
+          const StoryGenerationException(StoryGenerationFailure.limitReached),
         422 => const StoryGenerationException(StoryGenerationFailure.moderation),
         502 || 503 =>
           const StoryGenerationException(StoryGenerationFailure.unavailable),
@@ -146,6 +161,8 @@ class StoryGenerationException implements Exception {
           'De verhaaltjesmaker is even niet bereikbaar. Probeer het zo nog eens.',
         StoryGenerationFailure.notSignedIn =>
           'Je bent uitgelogd. Log opnieuw in.',
+        StoryGenerationFailure.limitReached =>
+          'Je gratis verhaaltjes voor deze week zijn op.',
         StoryGenerationFailure.unknown =>
           'Er ging iets mis. Probeer het opnieuw.',
       };

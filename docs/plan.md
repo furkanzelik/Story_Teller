@@ -35,9 +35,15 @@ heropenen. Rate limiting toegevoegd (`services/rate_limit.py`, via `usage_events
 20 generaties + 40 audio per user per uur.
 
 ## Fase 5 — Monetization & compliance
-14. Ouder-gate vóór instellingen en betaalscherm  (client-deel staat al)
-15. Abonnementslaag via RevenueCat
-16. Gratis-laag limiet (bv. 2 verhalen/week zonder abonnement) — via usage_events
+14. Ouder-gate vóór instellingen en betaalscherm                              ✅ (Fase 1)
+15. Abonnementslaag: `subscriptions`-tabel, `GET /me/subscription`,
+    `POST /webhooks/revenuecat` (klaar, wacht op `REVENUECAT_WEBHOOK_AUTH`),
+    paywall-scherm. Koop-knop stub tot store-credentials er zijn.            ◑
+16. Gratis-laag limiet: **2 verhalen/week** (kalenderweek, ma 00:00 UTC),
+    `services/quota.py`, 402 → paywall. Abonnees onbeperkt.                  ✅
+
+Nog te doen bij store-setup: `purchases_flutter` (RevenueCat SDK) in de app,
+`REVENUECAT_WEBHOOK_AUTH` in `.env`, App Store / Play Console producten.
 
 ## Fase 6 — Polish & store-ready
 17. Kindvriendelijke UI-polish

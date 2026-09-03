@@ -28,6 +28,12 @@ class Settings(BaseSettings):
     generation_rate_limit_per_hour: int = 20
     audio_rate_limit_per_hour: int = 40
 
+    # --- subscription / free tier (Fase 5) ---
+    # Stories a non-subscriber can generate per calendar week (Mon 00:00 UTC).
+    free_stories_per_week: int = 2
+    # RevenueCat -> Project -> Webhooks -> Authorization header value.
+    revenuecat_webhook_auth: str | None = None
+
     # postgresql+psycopg://user:pass@host:5432/dbname
     database_url: str = (
         "postgresql+psycopg://storyteller:storyteller@localhost:5432/storyteller"

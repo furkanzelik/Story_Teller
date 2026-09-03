@@ -51,6 +51,20 @@ class SetSavedIn(BaseModel):
     saved: bool
 
 
+class QuotaOut(BaseModel):
+    unlimited: bool
+    limit: int
+    used: int
+    remaining: int
+    resets_at: datetime
+
+
+class SubscriptionOut(BaseModel):
+    status: str          # "free" | "active" | "in_grace" | "expired"
+    plan: str | None = None
+    quota: QuotaOut
+
+
 class GenerateStoryIn(BaseModel):
     """Request body for Fase 2. Kept here so the contract is visible now."""
 
